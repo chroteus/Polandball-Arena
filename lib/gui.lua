@@ -4,15 +4,17 @@ GUI = {}
 
 GUI.colours = {
 	idle = {
-		bg = {255,255,255,30 },
+		bg = {255,255,255,20 },
 		fg = {200,200,200,255},
 	},
 	
 	active = {
 		bg = {255,255,255,60},
-		fg = {225,225,225,255},
+		fg = {200,200,200,255},
 	},
 }
+
+GUI.SKIN = "assets/images/guiskin"
 
 GUI.Element = Base:subclass("GUIElement")
 
@@ -32,18 +34,41 @@ function GUI.Element:setState(state)
 	return self
 end
 
-function GUI.Element:setText(text)
+------------------------------------------------------------------------
+
+GUI.Button = GUI.Element:subclass("GUIButton")
+
+function GUI.Button:initialize(text)
+	assert(type(text) == "string", "A string should be supplied to constructor of GUI.Button")
+	self:setText(text)
+
+	GUI.Element.initialize(self)
+end
+
+function GUI.Button:setFont(font)
+    self.font = font
+    
+    return self
+end
+
+function GUI.Button:setFontSize(size)
+    self.font_size = size
+
+    return self
+end
+
+function GUI.Button:setText(text)
 	if self.dyn_text then
 		error("A dynamic text is already set. Static text cannot be set")
 	end
 	
-	assert(type(text) == "string", "A string should be supplied to GUI.Element:setText")
+	assert(type(text) == "string", "A string should be supplied to GUI.Button:setText")
 	self.text = text
 	
 	return self
 end
 
-function GUI.Element:setDynamicText(table, item)
+function GUI.Button:setDynamicText(table, item)
 	if self.text then 
 		error("A static text is already set. Dynamic text cannot be set")
 	end
@@ -58,26 +83,14 @@ function GUI.Element:setDynamicText(table, item)
 	return self
 end
 
-function GUI.Element:update(dt)
-	if self.dyn_text then
-		self.text = self.dyn_text.table[self.dyn_text.item]
-	end
-end
-	
-------------------------------------------------------------------------
-
-GUI.Button = GUI.Element:subclass("GUIButton")
-
-function GUI.Button:initialize(text)
-	assert(type(text) == "string", "A string should be supplied to constructor of GUI.Button")
-	self:setText(text)
-
-	GUI.Element.initialize(self)
-end
 
 function GUI.Button:update(dt)
 	if self:collidesWith(the.mouse) then self:setState("active")
     else self:setState("idle")
+	end
+    
+    if self.dyn_text then
+		self.text = self.dyn_text.table[self.dyn_text.item]
 	end
 end
 
@@ -100,11 +113,11 @@ end
 function GUI.Button:draw()
 	love.graphics.setColor(GUI.colours[self.state].bg)
 	love.graphics.rectangle("fill", self:getBBox())
-	love.graphics.rectangle("line", self:getBBox())
 
 	love.graphics.setColor(GUI.colours[self.state].fg)
+    --love.graphics.rectangle("line", self:getBBox())
 	
-	love.graphics.printf(
+    love.graphics.printf(
 		self.text, 
 		self.x, self.y + self.height/2 - love.graphics.getFont():getHeight()/2,
 		self.width, "center"

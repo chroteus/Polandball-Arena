@@ -1,14 +1,14 @@
 local anim8 = require "lib.anim8"
 
-Soldier = class("Soldier")
+Fighter = Base:subclass("Fighter")
 
-function Soldier:initialize(arg)
+function Fighter:initialize(arg)
 	self.attack_stat = arg.attack_stat or 10
 	self.defense = arg.defense or 10
 	self.hp = arg.hp or 10
 	self.maxHP = self.hp or 10
 
-	if not arg.frames then error("Frames for soldier not set") end
+	if not arg.frames then error("Frames for fighter not set") end
 	
 	if type(arg.frames) == "string" then
 		self.frames = love.graphics.newImage(arg.frames)
@@ -35,31 +35,25 @@ function Soldier:initialize(arg)
 	self.timer = Timer.new()
 	self.anim_state = "still_south"
 	self.scale = arg.scale or 1
+    self.speed = arg.speed or 200
+    
+    Base.initialize(self)
 end	
 
-function Soldier:setPos(x,y)
-	-- Sets either the true position, or if in Army,
-	-- position relative to army
-	self.x = x
-	self.y = y
-	
-	return self
-end
-
-function Soldier:setScale(scale)
+function Fighter:setScale(scale)
 	self.scale = scale
 	
 	return self
 end
 
-function Soldier:getDamage(attack_arg)
+function Fighter:getDamage(attack_arg)
 	local netAtt = attack_arg - self.defense
 	if netAtt < 0 then netAtt = 0 end
 	
 	self.hp = self.hp - netAtt
 end
 
-function Soldier:moveTo(x,y, finishFunc)
+function Fighter:moveTo(x,y, finishFunc)
 	self.timer:clear()
 	local duration = math.dist(self.x,self.y, x,y)/50/self.scale
 	local xDiff = math.abs(self.x - x)
@@ -84,9 +78,9 @@ function Soldier:moveTo(x,y, finishFunc)
 					end)
 end
 
-function Soldier:attack(soldier)
+function Fighter:attack(fighter)
 	local origX,origY = self.x, self.y
-	self:moveTo(soldier.x, soldier.y,
+	self:moveTo(fighter.x, fighter.y,
 		function()
 		-- finish func
 			soldier:getDamage(self.attack_stat)
@@ -95,14 +89,15 @@ function Soldier:attack(soldier)
 	)
 end
 
-function Soldier:update(dt)
+function Fighter:update(dt)
 	self.timer:update(dt)
 	self.anim[self.anim_state]:update(dt)
 end
 
-function Soldier:draw()
-	if not self.x or not self.y then error("Position for soldier not set") end
+function Fighter:draw()
+	if not self.x or not self.y then error("Position for fighter not set") end
 
+    print(self.anim_state)
 	self.anim[self.anim_state]:draw(self.frames, 
 									self.x, self.y)
 
