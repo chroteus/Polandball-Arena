@@ -132,9 +132,7 @@ function transitions.fade.switch(to, duration, ...)
     venus.timer.tween(duration / 2, transitions.fade, { alpha = 255 }, "out-quad", 
         function()
             f()
-            randBg()
             DialogBoxes:clear()
-            msgBox:reset()
         end
     )
 end

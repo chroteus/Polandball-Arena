@@ -174,7 +174,7 @@ function GUI.Container:setPos(x,y)
 	return self
 end
 
-function GUI.Container:setState(state)
+function GUI.Container:attachToState(state)
     local callbacks = {"update", "draw", "mousepressed", "mousereleased"}
     for _,callback in pairs(callbacks) do
         if state[callback] == nil then

@@ -5,14 +5,16 @@ function menu:init()
     :setElementSize(150,50)
     
     menu.btn:add{
-        GUI.Button("Start"),
+        GUI.Button("Start")
+        :setFunc(function() Gamestate.switch(select_scr) end),
+        
         GUI.Button("Quit"):setFunc(love.event.quit)
     }
     
     menu.btn:center()
-    menu.btn:setState(menu)
+    menu.btn:attachToState(menu)
 
-    menu.player = Player{frames = "assets/images/balls/Poland.png"}
+    menu.player = Player{name = "Poland"}
     :setPos(300,300)
 end
 

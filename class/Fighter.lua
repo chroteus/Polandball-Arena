@@ -3,17 +3,27 @@ local anim8 = require "lib.anim8"
 Fighter = Base:subclass("Fighter")
 
 function Fighter:initialize(arg)
+    self.name = arg.name or "Undefined name"
+
+    -- "attack_stat" is not "attack" to prevent conflict 
+    -- with method named "attack"
 	self.attack_stat = arg.attack_stat or 10
 	self.defense = arg.defense or 10
-	self.hp = arg.hp or 10
-	self.maxHP = self.hp or 10
+	self.hp = arg.hp or 100
 
-	if not arg.frames then error("Frames for fighter not set") end
-	
-	if type(arg.frames) == "string" then
-		self.frames = love.graphics.newImage(arg.frames)
+    local frames
+	if not arg.frames and self.name then 
+        frames = "assets/images/balls/" .. self.name .. ".png"
+    elseif not arg.frames and not self.name then
+        error("Neither name nor frames file defined")
+    else
+        frames = arg.frames
+    end
+        
+	if type(frames) == "string" then
+		self.frames = love.graphics.newImage(frames)
 	else
-		self.frames = arg.frames
+		self.frames = frames
 	end
 	
 	self.frames:setFilter("nearest", "nearest")
@@ -94,11 +104,10 @@ function Fighter:update(dt)
 	self.anim[self.anim_state]:update(dt)
 end
 
-function Fighter:draw()
-	if not self.x or not self.y then error("Position for fighter not set") end
+function Fighter:draw(x,y)
+    local x = x or self.x
+    local y = y or self.y
 
-    print(self.anim_state)
-	self.anim[self.anim_state]:draw(self.frames, 
-									self.x, self.y)
-
+	if not x or not y then error("Position for fighter not set") end
+	self.anim[self.anim_state]:draw(self.frames, x,y)
 end
