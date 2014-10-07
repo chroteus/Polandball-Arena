@@ -33,6 +33,19 @@ function love.load()
     }
     the.mouse = {x = 0, y = 0, width = 1, height = 1}
 
+    -- Font handling
+    FONT = {}
+    local fontHandle = {
+        __index = function(t, k)
+            FONT[k] =  love.graphics.newFont("assets/Sansation_Regular.ttf", k)
+            return FONT[k]
+        end
+    }
+    setmetatable(FONT, fontHandle)
+    FONT["default"] = FONT[16]
+    
+    love.graphics.setFont(FONT["default"])
+
     Gamestate.registerEvents()
     Gamestate.switch(menu)
 end

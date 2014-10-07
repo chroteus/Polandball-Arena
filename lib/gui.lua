@@ -397,6 +397,38 @@ function GUI.ShopButton:draw()
 	)
 end
 
+------------------------------------------------------------------------
+GUI.drawRect = function(x,y,w,h)
+    love.graphics.setColor(GUI.colours.idle.bg)
+    love.graphics.rectangle("fill", x,y,w,h)
+    love.graphics.setColor(GUI.colours.idle.fg)
+    --love.graphics.rectangle("line", x,y,w,h)
+    love.graphics.setColor(255,255,255)
+end
+    
+GUI.drawInfoBox = function(title, text, width,x,y,title_h)
+    local PADDING = 5
+    local width = width or 200
+    local x = x or the.mouse.x
+    local y = y or the.mouse.y
+    local title_h = title_h or FONT[18]:getHeight() + PADDING*2
+
+    x = x+10; y = y+10
+    
+    local font = love.graphics.getFont()
+	local _,linenum = font:getWrap(text, width)
+	local height = linenum * font:getHeight() + title_h + PADDING*2
+    
+    GUI.drawRect(x,y, width+PADDING, height)
+    GUI.drawRect(x,y, width+PADDING, title_h)
+    
+    love.graphics.setFont(FONT[18])
+    love.graphics.print(title, x+PADDING, y+PADDING)
+    love.graphics.setFont(FONT["default"])
+    love.graphics.printf(text, x+PADDING, y+PADDING+title_h, width-PADDING*2, "left")
+end
+    
+    
 
 
 

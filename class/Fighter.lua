@@ -4,6 +4,7 @@ Fighter = Base:subclass("Fighter")
 
 function Fighter:initialize(arg)
     self.name = arg.name or "Undefined name"
+    self.desc = arg.desc or "Undefined description"
 
     -- "attack_stat" is not "attack" to prevent conflict 
     -- with method named "attack"

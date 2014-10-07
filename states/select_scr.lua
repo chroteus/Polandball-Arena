@@ -2,7 +2,7 @@ select_scr = {}
 
 function select_scr:init()
     select_scr.btn = GUI.Container(3, "dynamic")
-    :setElementSize(200,50)
+    :setElementSize(180,50)
     
     local FighterBtn = GUI.Button:subclass("FighterBtn")
     
@@ -25,6 +25,10 @@ function select_scr:init()
     function FighterBtn:draw()
         GUI.Button.draw(self)
         self.fighter.draw(self.fighter, self.x, self.y)
+        
+        if self.state == "active" then
+            GUI.drawInfoBox(self.fighter.name, self.fighter.desc)
+        end
     end
         
     
