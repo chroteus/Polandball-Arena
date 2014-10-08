@@ -4,7 +4,6 @@ Fighter = Base:subclass("Fighter")
 
 function Fighter:initialize(arg)
     self.name = arg.name or "Undefined name"
-    self.desc = arg.desc or "Undefined description"
 
     -- "attack_stat" is not "attack" to prevent conflict 
     -- with method named "attack"
@@ -64,7 +63,7 @@ function Fighter:getDamage(attack_arg)
 	self.hp = self.hp - netAtt
 end
 
-function Fighter:moveTo(x,y, finishFunc)
+function Fighter:moveTo(x,y, arg)
 	self.timer:clear()
 	local duration = math.dist(self.x,self.y, x,y)/50/self.scale
 	local xDiff = math.abs(self.x - x)
@@ -85,15 +84,16 @@ function Fighter:moveTo(x,y, finishFunc)
 	self.timer:add(duration, 
 					function()
 						self.anim_state = "still_" .. self.anim_state
-						if finishFunc then finishFunc() end
+						
+                        if arg.finishFunc then arg.finishFunc() end
 					end)
 end
 
-function Fighter:attack(fighter)
+function Fighter:attack(fighter, arg)
 	local origX,origY = self.x, self.y
 	self:moveTo(fighter.x, fighter.y,
 		function()
-		-- finish func
+            if arg.finishFunc then arg.finishFunc() end
 			soldier:getDamage(self.attack_stat)
 			self:moveTo(origX,origY)
 		end

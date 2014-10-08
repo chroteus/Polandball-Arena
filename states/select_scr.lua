@@ -4,6 +4,8 @@ function select_scr:init()
     select_scr.btn = GUI.Container(3, "dynamic")
     :setElementSize(180,50)
     
+    --------------------------------------------------------------------
+    -- BUTTON TAILORED FOR SELECTION SCREEN
     local FighterBtn = GUI.Button:subclass("FighterBtn")
     
     function FighterBtn:initialize(fighter)
@@ -24,18 +26,25 @@ function select_scr:init()
     
     function FighterBtn:draw()
         GUI.Button.draw(self)
-        self.fighter.draw(self.fighter, self.x, self.y)
+        self.fighter.draw(self.fighter, self.x-20, self.y)
         
         if self.state == "active" then
-            GUI.drawInfoBox(self.fighter.name, self.fighter.desc)
+            GUI.drawInfoBox(self.fighter.name, 
+                              "Attack: ".. self.fighter.attack_stat
+                            .. "\n Defense: ".. self.fighter.defense
+                            .. "\n HP: "..self.fighter.hp)
         end
     end
+    --------------------------------------------------------------------
         
     
     for k,fighter in pairs(GLOBALS.fighters) do
         select_scr.btn:add(
             FighterBtn(fighter)
-            :setFunc(function() select_scr.selected_fighter = fighter end)
+            :setFunc(function() 
+                        GLOBALS.player = Player(fighter)
+                        Gamestate.switch(char_scr)
+                    end)
         )
     end
     

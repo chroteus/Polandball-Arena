@@ -6,13 +6,17 @@ Timer = require "lib.hump.timer"
 Camera = require "lib.amo"
 Gamestate = require "lib.venus"
 Class = require "lib.middleclass"
-require "lib.gui" -- GUI lib.
+require "lib.gui"
+require "lib.math"
 require "lib.TEsound"
 
 -- Classes
 require "class.Base"
     require "class.Fighter"
         require "class.Player"
+        require "class.FighterAI"
+        
+require "class.Arena"
 
 -- Objects
 require "objects.fighters"
@@ -20,6 +24,7 @@ require "objects.fighters"
 -- States
 require "states.menu"
 require "states.select_scr"
+require "states.char_scr"
 
 -- Misc
 require "misc.dbox"
