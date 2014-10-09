@@ -45,7 +45,7 @@ function Fighter:initialize(arg)
 	self.timer = Timer.new()
 	self.anim_state = "still_south"
 	self.scale = arg.scale or 1
-    self.speed = arg.speed or 200
+    self.speed = arg.speed or 150
     
     Base.initialize(self)
 end	
@@ -64,44 +64,44 @@ function Fighter:getDamage(attack_arg)
 end
 
 function Fighter:moveTo(x,y, arg)
-	self.timer:clear()
-	local duration = math.dist(self.x,self.y, x,y)/50/self.scale
-	local xDiff = math.abs(self.x - x)
-	local yDiff = math.abs(self.y - y)
-	
-	if xDiff > yDiff then
-		if self.x > x then self.anim_state = "west"
-		elseif self.x < x then self.anim_state = "east"
-		end
-	else
-		if self.y > y then self.anim_state = "north"
-		elseif self.y < y then self.anim_state = "south"
-		end
-	end
-	
-	self.timer:tween(duration, self, {x = x})
-	self.timer:tween(duration, self, {y = y})
-	self.timer:add(duration, 
-					function()
-						self.anim_state = "still_" .. self.anim_state
-						
-                        if arg.finishFunc then arg.finishFunc() end
-					end)
+    self.goal_x = x
+    self.goal_y = y
+    if arg then self.funcOnArrival = arg.finishFunc end
+    
+    return self
 end
 
-function Fighter:attack(fighter, arg)
-	local origX,origY = self.x, self.y
-	self:moveTo(fighter.x, fighter.y,
-		function()
-            if arg.finishFunc then arg.finishFunc() end
-			soldier:getDamage(self.attack_stat)
-			self:moveTo(origX,origY)
+-- Internal function, thus prefixed with an underscore.
+function Fighter:_move(dt)
+	local xDiff = math.abs(self.x - self.goal_x)
+	local yDiff = math.abs(self.y - self.goal_y)
+	
+	if xDiff > yDiff then
+		if self.x > self.goal_x then self.anim_state = "west"
+		elseif self.x < self.goal_x then self.anim_state = "east"
 		end
-	)
+	else
+		if self.y > self.goal_y then self.anim_state = "north"
+		elseif self.y < self.goal_y then self.anim_state = "south"
+		end
+	end
+
+    local angle = math.atan2(self.goal_y - self.y, self.goal_x - self.x)
+    self.x = self.x + (self.speed * math.cos(angle)) * dt
+    self.y = self.y + (self.speed * math.sin(angle)) * dt
+    
+    if  (self.goal_x-2 <= self.x and self.x <= self.goal_x+2) 
+    and (self.goal_y-2 <= self.y and self.y <= self.goal_y+2)  then
+        self.goal_x = nil
+        self.goal_y = nil
+        
+        self.funcOnArrival()
+        self.anim_state = "still_" .. self.anim_state
+    end
 end
 
 function Fighter:update(dt)
-	self.timer:update(dt)
+    if self.goal_x and self.goal_y then self:_move(dt) end
 	self.anim[self.anim_state]:update(dt)
 end
 
