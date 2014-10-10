@@ -48,6 +48,9 @@ function Arena:start()
                         fighter:addEnemies(enemy_team)
                     end
                 end
+                
+                -- Trigger ai
+                fighter:ai()
             end
             
         end

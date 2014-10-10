@@ -47,6 +47,8 @@ function Fighter:initialize(arg)
 	self.scale = arg.scale or 1
     self.speed = arg.speed or 150
     
+    self.stop_moving = true
+    
     Base.initialize(self)
 end	
 
@@ -63,9 +65,25 @@ function Fighter:getDamage(attack_arg)
 	self.hp = self.hp - netAtt
 end
 
+function Fighter:knockback(angle, power)
+    local angle = math.rad(angle)
+end
+
 function Fighter:moveTo(x,y, arg)
-    self.goal_x = x
-    self.goal_y = y
+    -- can either accept this syntax: moveTo(entity, arg)
+    -- or: moveTo(x,y, arg)
+    if type(x) == "table" then
+        self.goal_entity = x
+    else
+        self.goal_x = x
+        self.goal_y = y
+    end
+    
+    local arg
+    if type(y) == "table" then
+        arg = y
+    end
+
     if arg then self.funcOnArrival = arg.finishFunc end
     
     return self
@@ -73,36 +91,44 @@ end
 
 -- Internal function, thus prefixed with an underscore.
 function Fighter:_move(dt)
-	local xDiff = math.abs(self.x - self.goal_x)
-	local yDiff = math.abs(self.y - self.goal_y)
+    local goal_x = self.goal_x or self.goal_entity.x
+    local goal_y = self.goal_y or self.goal_entity.y
+    
+	local xDiff = math.abs(self.x - goal_x)
+	local yDiff = math.abs(self.y - goal_y)
 	
 	if xDiff > yDiff then
-		if self.x > self.goal_x then self.anim_state = "west"
-		elseif self.x < self.goal_x then self.anim_state = "east"
+		if self.x > goal_x then self.anim_state = "west"
+		elseif self.x < goal_x then self.anim_state = "east"
 		end
 	else
-		if self.y > self.goal_y then self.anim_state = "north"
-		elseif self.y < self.goal_y then self.anim_state = "south"
+		if self.y > goal_y then self.anim_state = "north"
+		elseif self.y < goal_y then self.anim_state = "south"
 		end
 	end
 
-    local angle = math.atan2(self.goal_y - self.y, self.goal_x - self.x)
+    local angle = math.atan2(goal_y - self.y, goal_x - self.x)
     self.x = self.x + (self.speed * math.cos(angle)) * dt
     self.y = self.y + (self.speed * math.sin(angle)) * dt
     
-    if  (self.goal_x-2 <= self.x and self.x <= self.goal_x+2) 
-    and (self.goal_y-2 <= self.y and self.y <= self.goal_y+2)  then
+    if  (goal_x-3 <= self.x and self.x <= goal_x+3) 
+    and (goal_y-3 <= self.y and self.y <= goal_y+3)  then
         self.goal_x = nil
         self.goal_y = nil
+        self.goal_entity = nil
         
-        self.funcOnArrival()
+        if self.funcOnArrival then self.funcOnArrival() end
         self.anim_state = "still_" .. self.anim_state
     end
 end
 
 function Fighter:update(dt)
-    if self.goal_x and self.goal_y then self:_move(dt) end
-	self.anim[self.anim_state]:update(dt)
+    if (self.goal_x and self.goal_y) or self.goal_entity
+    and not self.attack_anim_played then
+        self:_move(dt) 
+    end
+	
+    self.anim[self.anim_state]:update(dt)
 end
 
 function Fighter:draw(x,y)
