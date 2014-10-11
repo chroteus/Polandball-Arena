@@ -42,6 +42,8 @@ function Fighter:initialize(arg)
 		north = anim8.newAnimation(grid("7-9", 1), 0.1),
 	}
 	
+    setmetatable(self.anim, {__index = function(t,k) error("Animation " .. k .. " doesn't exist") end})
+    
 	self.timer = Timer.new()
 	self.anim_state = "still_south"
 	self.scale = arg.scale or 1
@@ -66,7 +68,9 @@ function Fighter:getDamage(attack_arg)
 end
 
 function Fighter:knockback(angle, power)
-    local angle = math.rad(angle)
+    local power = power or 50
+    Timer.tween(0.3, self, {x = self.x + power*math.cos(angle)}, "out-quad")
+    Timer.tween(0.3, self, {y = self.y + power*math.sin(angle)}, "out-quad")
 end
 
 function Fighter:moveTo(x,y, arg)
@@ -83,10 +87,23 @@ function Fighter:moveTo(x,y, arg)
     if type(y) == "table" then
         arg = y
     end
-
-    if arg then self.funcOnArrival = arg.finishFunc end
+    
+    
+    if arg and arg.finishFunc then self.funcOnArrival = arg.finishFunc end
     
     return self
+end
+
+function Fighter:_onArrival()
+    self.goal_x = nil
+    self.goal_y = nil
+    self.goal_entity = nil
+    
+    if self.funcOnArrival then self.funcOnArrival() end
+    
+    if self.anim_state:match("still") == nil then
+        self.anim_state = "still_" .. self.anim_state
+    end
 end
 
 -- Internal function, thus prefixed with an underscore.
@@ -113,12 +130,7 @@ function Fighter:_move(dt)
     
     if  (goal_x-3 <= self.x and self.x <= goal_x+3) 
     and (goal_y-3 <= self.y and self.y <= goal_y+3)  then
-        self.goal_x = nil
-        self.goal_y = nil
-        self.goal_entity = nil
-        
-        if self.funcOnArrival then self.funcOnArrival() end
-        self.anim_state = "still_" .. self.anim_state
+        self:_onArrival()
     end
 end
 
