@@ -4,6 +4,23 @@ function Player:initialize(arg)
     Fighter.initialize(self, arg)
 end
 
+function Player:attack()
+    local dist = function(a,b) return math.dist(a.x,a.y, b.x,b.y) end
+    
+    table.sort(self.enemies, function(a,b) return dist(self, self.enemy_to_attack) end)
+    self.enemy_to_attack = self.enemies[1]
+    
+    if self:inAttackZone() then
+        self:lookAt(self.enemy_to_attack.x, self.enemy_to_attack.y)
+        self:_attackAnim()
+        self.enemy_to_attack:getDamage(self.attack_stat)
+    end
+    
+end
+
+function Player:_onAttackEnd()
+end
+
 function Player:update(dt)
     Fighter.update(self, dt)
     
@@ -24,10 +41,16 @@ function Player:update(dt)
         self.anim_state = "north"
     end
     
-    if self.anim_state:find("still") == nil then
+    if self.anim_state:find("still") == nil and not self.attack_anim_played then
         if not (key("s") or key("down")) and not(key("w") or key("up"))
         and not (key("d") or key("right")) and not(key("a") or key("left")) then
             self.anim_state = "still_" .. self.anim_state
         end
+    end
+end
+
+function Player:keypressed(key)
+    if key == " " then
+        self:attack()
     end
 end

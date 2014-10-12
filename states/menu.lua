@@ -25,6 +25,8 @@ function menu:init()
     menu.arena:add(menu.player):to("allies")
     menu.arena:add(menu.enemy):to("enemies")
     menu.arena:start()
+    
+    love.graphics.setBackgroundColor(50,50,50)
 end
 
 function menu:update(dt)
@@ -34,3 +36,8 @@ end
 function menu:draw()
     menu.arena:draw()
 end
+
+function menu:keypressed(key)
+    menu.arena:keypressed(key)
+end
+

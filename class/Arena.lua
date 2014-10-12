@@ -39,20 +39,16 @@ end
 
 function Arena:start()
     for _,team in pairs(self.teams) do
-        for _,fighter in pairs(team) do
-            
-            if fighter:isInstanceOf(FighterAI) then
-                -- Add enemies for fighter to attack
-                for _,enemy_team in pairs(self.teams) do
-                    if enemy_team ~= team then
-                        fighter:addEnemies(enemy_team)
-                    end
+        for _,fighter in pairs(team) do            
+            -- Add enemies for fighter to attack
+            for _,enemy_team in pairs(self.teams) do
+                if enemy_team ~= team then
+                    fighter:addEnemies(enemy_team)
                 end
-                
-                -- Trigger ai
-                fighter:ai()
             end
             
+            -- Trigger ai
+            if fighter.ai then fighter:ai() end
         end
     end
 end
@@ -69,8 +65,19 @@ end
 
 function Arena:draw()
     for _,team in pairs(self.teams) do
+        table.sort(team, function(a,b) return a.y < b.y end)
         for _,fighter in pairs(team) do
             fighter:draw()
+        end
+    end
+end
+
+function Arena:keypressed(key)
+    for _,team in pairs(self.teams) do
+        for _,fighter in pairs(team) do
+            if fighter:isInstanceOf(Player) then
+                fighter:keypressed(key)
+            end
         end
     end
 end

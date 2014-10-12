@@ -27,7 +27,11 @@ function Fighter:initialize(arg)
 	end
 	
 	self.frames:setFilter("nearest", "nearest")
-	local grid = anim8.newGrid(75,70, self.frames:getWidth()-30, self.frames:getHeight(),15,0,0)
+    
+    -- size of frame
+    self.width = 75; self.height = 70
+    
+	local grid = anim8.newGrid(self.width,self.height, self.frames:getWidth()-30, self.frames:getHeight(),15,0,0)
 	self.anim = {
 		still_south = anim8.newAnimation(grid(1,1), 0.1),
 		south = anim8.newAnimation(grid("1-3", 1),  0.1),
@@ -50,6 +54,9 @@ function Fighter:initialize(arg)
     self.speed = arg.speed or 150
     
     self.stop_moving = true
+    self.enemies = {}
+    
+    self.attack_zone = arg.attack_zone or self.width-10
     
     Base.initialize(self)
 end	
@@ -73,6 +80,18 @@ function Fighter:knockback(angle, power)
     Timer.tween(0.3, self, {y = self.y + power*math.sin(angle)}, "out-quad")
 end
 
+function Fighter:inAttackZone()
+    if self.enemy_to_attack then
+        local enemy = self.enemy_to_attack
+        local d = math.dist(self.x+self.width/2,self.y+self.height/2, 
+                            enemy.x+enemy.width/2,enemy.y+enemy.height/2)
+                            
+        return d < self.attack_zone
+    else
+        return false
+    end
+end
+
 function Fighter:moveTo(x,y, arg)
     -- can either accept this syntax: moveTo(entity, arg)
     -- or: moveTo(x,y, arg)
@@ -94,6 +113,49 @@ function Fighter:moveTo(x,y, arg)
     return self
 end
 
+function Fighter:lookAt(x,y)
+	local xDiff = math.abs(self.x - x)
+	local yDiff = math.abs(self.y - y)
+	
+	if xDiff > yDiff then
+		if self.x > x then self.anim_state = "west"
+		elseif self.x < x then self.anim_state = "east"
+		end
+	else
+		if self.y > y then self.anim_state = "north"
+		elseif self.y < y then self.anim_state = "south"
+		end
+	end
+end
+    
+
+function Fighter:_attackAnim()
+    if not self.attack_anim_played then
+        local enemy = self.enemy_to_attack
+        local angle = math.atan2(enemy.y - self.y, enemy.x - self.x)
+        
+        Timer.tween(0.15, self, {x = self.x - self.attack_zone/2 * math.cos(angle)}, "linear")
+        Timer.tween(0.15, self, {y = self.y - self.attack_zone/2 * math.sin(angle)}, "linear",
+            function()
+                Timer.tween(0.3, self, {x = self.x + (self.attack_zone + 20) * math.cos(angle)}, "out-quint")
+                Timer.tween(0.3, self, {y = self.y + (self.attack_zone + 20) * math.sin(angle)}, "out-quint",
+                    function() self.attack_anim_played = false end)
+               
+               
+                if self.enemy_to_attack then
+                    self.enemy_to_attack:knockback(angle)
+                    self.enemy_to_attack:_onHit()
+                end
+                
+                self:_onArrival()
+                self:_onAttackEnd()
+            end
+        )
+        
+        self.attack_anim_played = true
+    end
+end
+
 function Fighter:_onArrival()
     self.goal_x = nil
     self.goal_y = nil
@@ -106,23 +168,16 @@ function Fighter:_onArrival()
     end
 end
 
+function Fighter:_onHit()
+end
+    
+
 -- Internal function, thus prefixed with an underscore.
 function Fighter:_move(dt)
     local goal_x = self.goal_x or self.goal_entity.x
     local goal_y = self.goal_y or self.goal_entity.y
     
-	local xDiff = math.abs(self.x - goal_x)
-	local yDiff = math.abs(self.y - goal_y)
-	
-	if xDiff > yDiff then
-		if self.x > goal_x then self.anim_state = "west"
-		elseif self.x < goal_x then self.anim_state = "east"
-		end
-	else
-		if self.y > goal_y then self.anim_state = "north"
-		elseif self.y < goal_y then self.anim_state = "south"
-		end
-	end
+    self:lookAt(goal_x, goal_y)
 
     local angle = math.atan2(goal_y - self.y, goal_x - self.x)
     self.x = self.x + (self.speed * math.cos(angle)) * dt
@@ -132,6 +187,20 @@ function Fighter:_move(dt)
     and (goal_y-3 <= self.y and self.y <= goal_y+3)  then
         self:_onArrival()
     end
+end
+
+function Fighter:addEnemy(fighter)
+    table.insert(self.enemies, fighter)
+
+    return self
+end
+
+function Fighter:addEnemies(team)
+    for _,enemy in pairs(team) do
+        self:addEnemy(enemy)
+    end
+    
+    return self
 end
 
 function Fighter:update(dt)
@@ -149,4 +218,7 @@ function Fighter:draw(x,y)
 
 	if not x or not y then error("Position for fighter not set") end
 	self.anim[self.anim_state]:draw(self.frames, x,y)
+    love.graphics.print(self.hp, self.x, self.y)
+    
+    --love.graphics.circle("line", self.x+self.width/2, self.y+self.height/2, self.attack_zone/2, self.attack_zone)
 end
