@@ -56,7 +56,9 @@ function Fighter:initialize(arg)
     self.stop_moving = true
     self.enemies = {}
     
-    self.attack_zone = arg.attack_zone or self.width-10
+    self.attack_zone = arg.attack_zone or self.width
+    self.timer = Timer.new()
+    
     
     Base.initialize(self)
 end	
@@ -75,9 +77,9 @@ function Fighter:getDamage(attack_arg)
 end
 
 function Fighter:knockback(angle, power)
-    local power = power or 50
-    Timer.tween(0.3, self, {x = self.x + power*math.cos(angle)}, "out-quad")
-    Timer.tween(0.3, self, {y = self.y + power*math.sin(angle)}, "out-quad")
+    local power = power or 60
+    self.timer:tween(0.3, self, {x = self.x + power*math.cos(angle)}, "out-quad")
+    self.timer:tween(0.3, self, {y = self.y + power*math.sin(angle)}, "out-quad")
 end
 
 function Fighter:inAttackZone()
@@ -85,7 +87,8 @@ function Fighter:inAttackZone()
         local enemy = self.enemy_to_attack
         local d = math.dist(self.x+self.width/2,self.y+self.height/2, 
                             enemy.x+enemy.width/2,enemy.y+enemy.height/2)
-                            
+        
+        
         return d < self.attack_zone
     else
         return false
@@ -134,14 +137,11 @@ function Fighter:_attackAnim()
         local enemy = self.enemy_to_attack
         local angle = math.atan2(enemy.y - self.y, enemy.x - self.x)
         
-        Timer.tween(0.15, self, {x = self.x - self.attack_zone/2 * math.cos(angle)}, "linear")
-        Timer.tween(0.15, self, {y = self.y - self.attack_zone/2 * math.sin(angle)}, "linear",
+        -- time it will take for attack animation to finish
+        local total_time = 0.6 
+        
+        self.timer:add(total_time/3, 
             function()
-                Timer.tween(0.3, self, {x = self.x + (self.attack_zone + 20) * math.cos(angle)}, "out-quint")
-                Timer.tween(0.3, self, {y = self.y + (self.attack_zone + 20) * math.sin(angle)}, "out-quint",
-                    function() self.attack_anim_played = false end)
-               
-               
                 if self.enemy_to_attack then
                     self.enemy_to_attack:knockback(angle)
                     self.enemy_to_attack:_onHit()
@@ -149,6 +149,14 @@ function Fighter:_attackAnim()
                 
                 self:_onArrival()
                 self:_onAttackEnd()
+            end)
+            
+        self.timer:tween(total_time/3, self, {x = self.x - self.width/3  * math.cos(angle)}, "in-quint")
+        self.timer:tween(total_time/3, self, {y = self.y - self.height/3 * math.sin(angle)}, "in-quint",
+            function()
+                self.timer:tween(total_time/1.5, self, {x = enemy.x + math.random(-10,10)}, "out-quint")
+                self.timer:tween(total_time/1.5, self, {y = enemy.y + math.random(-10,10)}, "out-quint",
+                    function() self.attack_anim_played = false end)
             end
         )
         
@@ -204,6 +212,8 @@ function Fighter:addEnemies(team)
 end
 
 function Fighter:update(dt)
+    self.timer:update(dt)
+
     if (self.goal_x and self.goal_y) or self.goal_entity
     and not self.attack_anim_played then
         self:_move(dt) 
@@ -220,5 +230,5 @@ function Fighter:draw(x,y)
 	self.anim[self.anim_state]:draw(self.frames, x,y)
     love.graphics.print(self.hp, self.x, self.y)
     
-    --love.graphics.circle("line", self.x+self.width/2, self.y+self.height/2, self.attack_zone/2, self.attack_zone)
+    --0love.graphics.circle("line", self.x+self.width/2, self.y+self.height/2, self.attack_zone/2, self.attack_zone)
 end

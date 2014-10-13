@@ -65,7 +65,7 @@ end
 
 function Arena:draw()
     for _,team in pairs(self.teams) do
-        table.sort(team, function(a,b) return a.y < b.y end)
+        table.sort(team, function(a,b) return b.y < a.y end)
         for _,fighter in pairs(team) do
             fighter:draw()
         end

@@ -31,6 +31,7 @@ function FighterAI:update(dt)
 end
 
 function FighterAI:ai()
+    print("ke")
     table.sort(self.enemies, function(a,b) return a.hp < b.hp end)
     self:attack(self.enemies[1])
 end
