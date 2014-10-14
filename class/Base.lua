@@ -38,6 +38,10 @@ function Base:isInsideOf(obj)
 		   self.y <= obj.y + obj.height
 end
 
+function Base:center()
+    return self.x+self.width/2, self.y+self.height/2
+end
+
 function Base:getBBox()
     return self.x,self.y,self.width,self.height
 end

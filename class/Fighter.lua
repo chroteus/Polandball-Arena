@@ -111,7 +111,7 @@ function Fighter:moveTo(x,y, arg)
     end
     
     
-    if arg and arg.finishFunc then self.funcOnArrival = arg.finishFunc end
+    if arg and arg.onArrival then self.funcOnArrival = arg.onArrival end
     
     return self
 end
@@ -138,7 +138,7 @@ function Fighter:_attackAnim()
         local angle = math.atan2(enemy.y - self.y, enemy.x - self.x)
         
         -- time it will take for attack animation to finish
-        local total_time = 0.6 
+        local total_time = 0.6
         
         self.timer:add(total_time/3, 
             function()
@@ -169,7 +169,7 @@ function Fighter:_onArrival()
     self.goal_y = nil
     self.goal_entity = nil
     
-    if self.funcOnArrival then self.funcOnArrival() end
+    if self.funcOnArrival then self.funcOnArrival(self) end
     
     if self.anim_state:match("still") == nil then
         self.anim_state = "still_" .. self.anim_state
