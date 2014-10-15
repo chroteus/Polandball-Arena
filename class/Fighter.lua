@@ -82,18 +82,19 @@ function Fighter:knockback(angle, power)
     self.timer:tween(0.3, self, {y = self.y + power*math.sin(angle)}, "out-quad")
 end
 
-function Fighter:inAttackZone()
+function Fighter:inAttackZone(arg_dist)
     if self.enemy_to_attack then
         local enemy = self.enemy_to_attack
         local d = math.dist(self.x+self.width/2,self.y+self.height/2, 
                             enemy.x+enemy.width/2,enemy.y+enemy.height/2)
         
         
-        return d < self.attack_zone
+        return d < (arg_dist or self.attack_zone)
     else
         return false
     end
 end
+
 
 function Fighter:moveTo(x,y, arg)
     -- can either accept this syntax: moveTo(entity, arg)
@@ -116,10 +117,13 @@ function Fighter:moveTo(x,y, arg)
     return self
 end
 
-function Fighter:lookAt(x,y)
+function Fighter:lookAt(x,y, arg)
 	local xDiff = math.abs(self.x - x)
 	local yDiff = math.abs(self.y - y)
-	
+    
+    local still
+    if arg and arg.still then still = arg.still end
+	    
 	if xDiff > yDiff then
 		if self.x > x then self.anim_state = "west"
 		elseif self.x < x then self.anim_state = "east"
@@ -129,6 +133,8 @@ function Fighter:lookAt(x,y)
 		elseif self.y < y then self.anim_state = "south"
 		end
 	end
+    
+    if still then self.anim_state = "still_"..self.anim_state end
 end
     
 
@@ -142,11 +148,6 @@ function Fighter:_attackAnim()
         
         self.timer:add(total_time/3, 
             function()
-                if self.enemy_to_attack then
-                    self.enemy_to_attack:knockback(angle)
-                    self.enemy_to_attack:_onHit()
-                end
-                
                 self:_onArrival()
                 self:_onAttackEnd()
             end)
@@ -177,6 +178,15 @@ function Fighter:_onArrival()
 end
 
 function Fighter:_onHit()
+end
+
+function Fighter:_onAttackEnd()
+    local enemy = self.enemy_to_attack
+    local angle = math.atan2(enemy.y - self.y, enemy.x - self.x)
+    
+    enemy:knockback(angle)
+    enemy:_onHit()
+    self:lookAt(enemy.x, enemy.y, {still = true})
 end
     
 
@@ -218,7 +228,7 @@ function Fighter:update(dt)
     and not self.attack_anim_played then
         self:_move(dt) 
     end
-	
+    
     self.anim[self.anim_state]:update(dt)
 end
 

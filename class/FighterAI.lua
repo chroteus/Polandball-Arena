@@ -2,7 +2,6 @@ FighterAI = Fighter:subclass("FighterAI")
 
 function FighterAI:initialize(arg)
     Fighter.initialize(self, arg)
-    self.attack_zone = self.attack_zone + 10
 end
 
 function FighterAI:attack(fighter)
@@ -14,10 +13,6 @@ function FighterAI:attack(fighter)
     else
         self:moveTo(fighter, {onArrival = function(self) self:attack(fighter) end})
     end
-end
-
-function FighterAI:_onAttackEnd()
-    self:ai()
 end
 
 function FighterAI:update(dt)

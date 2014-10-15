@@ -7,8 +7,8 @@ end
 function Player:attack()
     local dist = function(a,b) return math.dist(a.x,a.y, b.x,b.y) end
     
-    table.sort(self.enemies, function(a,b) return dist(self, self.enemy_to_attack) end)
     self.enemy_to_attack = self.enemies[1]
+    table.sort(self.enemies, function(a,b) return dist(self, self.enemy_to_attack) end)
     
     if self:inAttackZone() then
         self:lookAt(self.enemy_to_attack.x, self.enemy_to_attack.y)
@@ -16,9 +16,6 @@ function Player:attack()
         self.enemy_to_attack:getDamage(self.attack_stat)
     end
     
-end
-
-function Player:_onAttackEnd()
 end
 
 function Player:update(dt)
