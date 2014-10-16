@@ -37,7 +37,7 @@ end
     
 ------------------------------------------------------------------------
 
-function Arena:start()
+function Arena:start(arg)
     for _,team in pairs(self.teams) do
         for _,fighter in pairs(team) do            
             -- Add enemies for fighter to attack
@@ -50,6 +50,11 @@ function Arena:start()
             -- Trigger ai
             if fighter.ai then fighter:ai() end
         end
+    end
+    
+    if not(arg and arg.dont_switch) then
+        game.arena = self
+        Gamestate.switch(game)
     end
 end
 

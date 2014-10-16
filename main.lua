@@ -22,6 +22,7 @@ require "class.Arena"
 require "objects.fighters"
 
 -- States
+require "states.game"
 require "states.menu"
 require "states.select_scr"
 require "states.char_scr"
