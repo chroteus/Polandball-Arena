@@ -59,13 +59,8 @@ function Fighter:initialize(arg)
     self.attack_zone = arg.attack_zone or self.width
     self.timer = Timer.new()
     
+    self.items = {}
     
-    Base.initialize(self)
-end	
-
-function Fighter:setScale(scale)
-	self.scale = scale
-	
 	return self
 end
 
@@ -220,6 +215,20 @@ function Fighter:addEnemies(team)
     
     return self
 end
+
+------------------------------------------------------------------------
+
+function Fighter:equip(item)
+    self.items[item.type] = item
+    item.onEquip(self)
+end
+
+function Fighter:unequip(slot)
+    self.items[slot] = nil
+    item.onUnequip(self)
+end
+
+------------------------------------------------------------------------
 
 function Fighter:update(dt)
     self.timer:update(dt)
