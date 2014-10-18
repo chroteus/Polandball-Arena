@@ -14,11 +14,14 @@ function menu:init()
     menu.btn:center()
     menu.btn:attachToState(menu)
     
-    love.graphics.setBackgroundColor(50,50,50)
+    love.graphics.setBackgroundColor(130,120,255)
     
     -- TEST
+    
     menu.player = Fighter{name = "Poland"}
     :setPos(320, 500)
+    
+    menu.player:equip(GLOBALS.items.iron_sword)
 end
 
 function menu:update(dt)

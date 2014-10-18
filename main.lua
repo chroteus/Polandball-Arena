@@ -6,6 +6,8 @@ Timer = require "lib.hump.timer"
 Camera = require "lib.amo"
 Gamestate = require "lib.venus"
 Class = require "lib.middleclass"
+anim8 = require "lib.anim8"
+
 require "lib.gui"
 require "lib.math"
 require "lib.TEsound"
@@ -17,9 +19,11 @@ require "class.Base"
         require "class.FighterAI"
         
 require "class.Arena"
+require "class.Item"
 
 -- Objects
 require "objects.fighters"
+require "objects.items"
 
 -- States
 require "states.game"

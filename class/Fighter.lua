@@ -1,5 +1,3 @@
-local anim8 = require "lib.anim8"
-
 Fighter = Base:subclass("Fighter")
 
 function Fighter:initialize(arg)
@@ -239,15 +237,31 @@ function Fighter:update(dt)
     end
     
     self.anim[self.anim_state]:update(dt)
+    for _,item in pairs(self.items) do
+        item:update(dt)
+    end
 end
 
 function Fighter:draw(x,y)
     local x = x or self.x
     local y = y or self.y
 
+    -- drawing item from behind
+    if self.anim_state == "east" or self.anim_state == "still_east" then
+        for k,item in pairs(self.items) do
+            item:draw(self.anim_state, x,y)
+        end
+    end
+    
 	if not x or not y then error("Position for fighter not set") end
 	self.anim[self.anim_state]:draw(self.frames, x,y)
     love.graphics.print(self.hp, self.x, self.y)
+    
+    if self.anim_state ~= "east" and self.anim_state ~= "still_east" then
+        for k,item in pairs(self.items) do
+            item:draw(self.anim_state, x,y)
+        end
+    end
     
     --0love.graphics.circle("line", self.x+self.width/2, self.y+self.height/2, self.attack_zone/2, self.attack_zone)
 end
