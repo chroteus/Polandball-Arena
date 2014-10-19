@@ -14,7 +14,7 @@ function menu:init()
     menu.btn:center()
     menu.btn:attachToState(menu)
     
-    love.graphics.setBackgroundColor(130,120,255)
+    love.graphics.setBackgroundColor(20,20,20)
     
     -- TEST
     
