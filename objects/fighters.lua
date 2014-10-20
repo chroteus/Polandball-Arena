@@ -1,5 +1,3 @@
 GLOBALS.fighters = {
-    Poland = Fighter{
-        name = "Poland",
-    }
+    Fighter{name = "Poland"},
 }

@@ -16,4 +16,6 @@ function char_scr:draw()
     local x = the.screen.width/5 - char.width/2
     local y = the.screen.height/3 - char.height/2 
     char:draw(x,y)
+    
+    
 end

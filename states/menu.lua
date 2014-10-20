@@ -15,20 +15,4 @@ function menu:init()
     menu.btn:attachToState(menu)
     
     love.graphics.setBackgroundColor(20,20,20)
-    
-    -- TEST
-    
-    menu.player = Fighter{name = "Poland"}
-    :setPos(320, 500)
-    
-    menu.player:equip(GLOBALS.items.iron_sword)
-end
-
-function menu:update(dt)
-    menu.player:moveTo(the.mouse.x, the.mouse.y)
-    menu.player:update(dt)
-end
-
-function menu:draw()
-    menu.player:draw()
 end

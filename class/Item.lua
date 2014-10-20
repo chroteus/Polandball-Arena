@@ -56,6 +56,13 @@ function Item:initialize(arg)
 		north = anim8.newAnimation(grid("7-9", 1), 0.1),
 	}
     
+    
+    -- side: can be either "one" or "both"
+    -- determines whether item will be drawn on both sides of the ball
+    -- or only one
+    self.side = arg.side or "one"
+    
+    
     self.anim_state = "still_south"
 end
 

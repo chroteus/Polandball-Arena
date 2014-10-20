@@ -86,3 +86,19 @@ function Arena:keypressed(key)
         end
     end
 end
+
+function Arena:attachToState(state)
+    local callbacks = {"update", "draw", "keypressed"}
+    for _,callback in pairs(callbacks) do
+        if state[callback] == nil then
+            state[callback] = function(state, ...) end
+        end
+        
+        local orig = state[callback]
+        
+        state[callback] = function(state_self, ...)
+            orig(state_self, ...)
+            self[callback](self, ...)
+        end
+    end
+end

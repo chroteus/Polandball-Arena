@@ -30,6 +30,7 @@ require "states.game"
 require "states.menu"
 require "states.select_scr"
 require "states.char_scr"
+require "states.enemy_scr"
 
 -- Misc
 require "misc.dbox"
@@ -63,9 +64,14 @@ end
 function love.update(dt)
     Timer.update(dt)
     the.mouse.x, the.mouse.y = love.mouse.getPosition()
+    DialogBoxes:update(dt)
 end
 
 function love.draw()
+end
+
+function love.mousereleased(x,y,button)
+     DialogBoxes:mousereleased(x,y,button)
 end
 
 function table.count(t)

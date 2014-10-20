@@ -32,7 +32,10 @@ function DialogBox:initialize(text, ...)
         end
         
         table.insert(self.buttons,
-            Button(x,y,width,height,text, func)
+            GUI.Button(text)
+            :setSize(width,height)
+            :setPos(x,y)
+            :setFunc(func)
         )
     end
 end
@@ -44,7 +47,7 @@ end
 
 function DialogBox:show(hideFunc)
     if not self.enabled then
-        if venus.current == game then
+        if Gamestate.current == game then
             self.hideFunc = hideFunc or function() love.mouse.setVisible(false) end
         else
             self.hideFunc = hideFunc
@@ -109,9 +112,9 @@ end
 
 function DialogBox:draw()
     if self.enabled then
-        love.graphics.setColor(guiColors.bg[1],guiColors.bg[2],guiColors.bg[3],self.alpha)
+        love.graphics.setColor(GUI.colours.idle.bg)
         love.graphics.rectangle("fill",self.x,self.y,self.width,self.height)
-        love.graphics.setColor(guiColors.fg)
+        love.graphics.setColor(GUI.colours.idle.fg)
         love.graphics.rectangle("line",self.x,self.y,self.width,self.height)    
         love.graphics.printf(self.text,self.x+padding,self.y+padding,self.width-padding,"left")
         

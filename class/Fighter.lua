@@ -5,7 +5,7 @@ function Fighter:initialize(arg)
 
     -- "attack_stat" is not "attack" to prevent conflict 
     -- with method named "attack"
-	self.attack_stat = arg.attack_stat or 10
+	self.attack_stat = arg.attack or 10
 	self.defense = arg.defense or 10
 	self.hp = arg.hp or 100
 
