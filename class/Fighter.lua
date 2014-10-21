@@ -217,13 +217,13 @@ end
 ------------------------------------------------------------------------
 
 function Fighter:equip(item)
-    self.items[item.type] = item
-    item.onEquip(self)
+    self.items[item.type] = Item(item)
+    self.items[item.type].onEquip(self)
 end
 
 function Fighter:unequip(slot)
+    self.items[slot].onUnequip(self)
     self.items[slot] = nil
-    item.onUnequip(self)
 end
 
 ------------------------------------------------------------------------
@@ -255,7 +255,6 @@ function Fighter:draw(x,y)
     
 	if not x or not y then error("Position for fighter not set") end
 	self.anim[self.anim_state]:draw(self.frames, x,y)
-    love.graphics.print(self.hp, self.x, self.y)
     
     if self.anim_state ~= "east" and self.anim_state ~= "still_east" then
         for k,item in pairs(self.items) do

@@ -324,7 +324,7 @@ end
 
 function GUI.FighterBtn:draw()
     GUI.Button.draw(self)
-    self.fighter.draw(self.fighter, self.x-20, self.y)
+    self.fighter.draw(self.fighter, self.x-self.fighter.width/2, self.y)
     
     if self.state == "active" then
         GUI.drawInfoBox(self.fighter.name, 

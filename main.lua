@@ -36,6 +36,7 @@ require "states.enemy_scr"
 require "misc.dbox"
 
 DEBUG = true
+math.random = love.math.random
 
 function love.load()
     the = {

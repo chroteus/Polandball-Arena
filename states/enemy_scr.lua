@@ -6,9 +6,12 @@ function enemy_scr:init()
     :setElementSize(200,60)
     
     for i=1,5 do
-        local difficulty = math.floor(i/2)
+        local difficulty = math.ceil(i/2)
         enemy_scr.btn:add(GUI.FighterBtn(randomEnemy(difficulty)))
     end
+    
+    enemy_scr.btn:center()
+    enemy_scr.btn:attachToState(enemy_scr)
 end
 
 function enemy_scr:enter()
