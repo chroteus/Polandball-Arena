@@ -24,12 +24,12 @@ function Fighter:initialize(arg)
 		self.frames = frames
 	end
 	
-	self.frames:setFilter("nearest", "nearest")
+	--self.frames:setFilter("nearest", "nearest")
     
     -- size of frame
     self.width = 75; self.height = 70
     
-	local grid = anim8.newGrid(self.width,self.height, self.frames:getWidth()-30, self.frames:getHeight(),15,0,0)
+	local grid = anim8.newGrid(self.width,self.height, self.frames:getWidth()-30, self.frames:getHeight(),10,0,0)
 	self.anim = {
 		still_south = anim8.newAnimation(grid(1,1), 0.1),
 		south = anim8.newAnimation(grid("1-3", 1),  0.1),
