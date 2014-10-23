@@ -21,7 +21,6 @@ function Arena:add(fighter)
         "Call Arena:to before calling Arena:add.")
         
     self.temp_fighter = fighter
-    
     return self
 end
 
