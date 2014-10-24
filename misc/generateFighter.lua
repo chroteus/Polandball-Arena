@@ -7,14 +7,15 @@ local function randomAdjective()
     return adjectives[math.random(#adjectives)]
 end
 
-local function generateFighters(difficulty)
+local function generateFighter(difficulty, FighterType)
     local difficulty = difficulty or 1
     local fighter = GLOBALS.fighters[math.random(#GLOBALS.fighters)]
 
     -- fighter: Fighter to base our random fighter on
     -- f: Fighter to return
 
-    local f = Fighter{
+    local FighterType = FighterType or FighterAI
+    local f = FighterType{
         name    = fighter.name,
         attack  = fighter.attack_stat*difficulty + math.random(-3,3),
         defense = fighter.defense*difficulty + math.random(-3,3),
@@ -36,5 +37,4 @@ local function generateFighters(difficulty)
     return f
 end
 
-return generateFighters
-        
+return generateFighter        

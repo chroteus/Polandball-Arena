@@ -1,5 +1,4 @@
 -- Switch to game with Arena:start or else it'll crash.
--- OR call game.defaultArena()
 game = {}
 
 function game:init()
