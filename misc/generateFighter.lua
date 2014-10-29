@@ -17,9 +17,9 @@ local function generateFighter(difficulty, FighterType)
     local FighterType = FighterType or FighterAI
     local f = FighterType{
         name    = fighter.name,
-        attack  = fighter.attack_stat*difficulty + math.random(-3,3),
-        defense = fighter.defense*difficulty + math.random(-3,3),
-        hp      = fighter.hp*difficulty + math.random(-10,10),
+        attack  = math.clamp(1, fighter.attack_stat*difficulty + math.random(-3,3), math.huge),
+        defense = math.clamp(0, fighter.defense*difficulty + math.random(-3,3), math.huge),
+        hp      = math.clamp(1, (fighter.hp*difficulty) + math.random(-10,10), math.huge),
     }
     f.name = randomAdjective() .. " " .. f.name
     

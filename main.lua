@@ -59,7 +59,9 @@ function love.load()
     love.graphics.setFont(FONT["default"])
 
     Gamestate.registerEvents()
+    Gamestate.duration = 0.6
     Gamestate.switch(menu)
+    
 end
 
 function love.update(dt)

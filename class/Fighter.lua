@@ -5,9 +5,15 @@ function Fighter:initialize(arg)
 
     -- "attack_stat" is not "attack" to prevent conflict 
     -- with method named "attack"
-	self.attack_stat = arg.attack or 10
-	self.defense = arg.defense or 10
-	self.hp = arg.hp or 100
+	self.attack_stat = arg.attack or 5
+	self.attack_stat = math.ceil(self.attack_stat)
+    
+    self.defense = arg.defense or 5
+	self.defense = math.ceil(self.defense)
+    
+    self.hp = arg.hp or 100
+    self.hp = math.ceil(self.hp)
+    self.max_hp = self.hp
 
     local frames
 	if not arg.frames and self.name then 
@@ -64,7 +70,7 @@ end
 
 function Fighter:getDamage(attack_arg)
 	local netAtt = attack_arg - self.defense
-	if netAtt < 0 then netAtt = 0 end
+	if netAtt < 1 then netAtt = 1 end
 	
 	self.hp = self.hp - netAtt
 end
@@ -142,7 +148,7 @@ function Fighter:_attackAnim()
         self.timer:add(total_time/3, 
             function()
                 self:_onArrival()
-                self:_onAttackEnd()
+                self:_onAttack(enemy)
             end)
             
         self.timer:tween(total_time/3, self, {x = self.x - self.width/3  * math.cos(angle)}, "in-quint")
@@ -173,9 +179,9 @@ end
 function Fighter:_onHit()
 end
 
-function Fighter:_onAttackEnd()
-    local enemy = self.enemy_to_attack
+function Fighter:_onAttack(enemy)
     local angle = math.atan2(enemy.y - self.y, enemy.x - self.x)
+    enemy:getDamage(self.attack_stat)
     
     enemy:knockback(angle)
     enemy:_onHit()
@@ -245,7 +251,7 @@ function Fighter:update(dt)
     end
 end
 
-function Fighter:draw(x,y)
+function Fighter:draw(x,y, noHP)
     local x = x or self.x
     local y = y or self.y
 
@@ -264,6 +270,15 @@ function Fighter:draw(x,y)
             item:draw(self.anim_state, x,y)
         end
     end
-    
-    --0love.graphics.circle("line", self.x+self.width/2, self.y+self.height/2, self.attack_zone/2, self.attack_zone)
+
+    if not noHP then
+        love.graphics.setColor(200,100,100, 128)
+        love.graphics.rectangle("line", self.x, self.y-10, self.width, 10)
+        love.graphics.rectangle("fill", self.x, self.y-10, (self.width/self.max_hp)*self.hp, 10)
+        love.graphics.setColor(255,255,255)
+        love.graphics.setFont(FONT[14])
+        love.graphics.print(self.hp .. "/" .. self.max_hp, 
+                            self.x, self.y-10-FONT[14]:getHeight()/4)
+        love.graphics.setColor(255,255,255)
+    end
 end

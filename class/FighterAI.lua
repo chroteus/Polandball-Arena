@@ -9,7 +9,6 @@ function FighterAI:attack(fighter)
 
     if self:inAttackZone() then
         self:_attackAnim()
-        fighter:getDamage(self.attack_stat)
     else
         self:moveTo(fighter, {onArrival = function(self) self:attack(fighter) end})
     end

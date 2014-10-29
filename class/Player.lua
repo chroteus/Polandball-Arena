@@ -13,7 +13,6 @@ function Player:attack()
     if self:inAttackZone() then
         self:lookAt(self.enemy_to_attack.x, self.enemy_to_attack.y)
         self:_attackAnim()
-        self.enemy_to_attack:getDamage(self.attack_stat)
     end
     
 end
