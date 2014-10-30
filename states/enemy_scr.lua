@@ -9,7 +9,6 @@ function enemy_scr:init()
     
     for i=1,5 do
         local difficulty = i/2.5
-        print(difficulty)
         local enemy = randomEnemy(difficulty):setPos(600, 250)
         GLOBALS.player:setPos(80, 250)
         

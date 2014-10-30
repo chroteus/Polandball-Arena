@@ -1,6 +1,6 @@
 GLOBALS.items = {
     Item{name = "Iron Sword", type = "primary",
-         onEquip = function() print("equip") end,
-         onUnequip = function() print("took off") end,
+         onEquip   = function(fighter) fighter.attack_stat = fighter.attack_stat + 1 end,
+         onUnequip = function(fighter) fighter.attack_stat = fighter.attack_stat - 1 end,
     },
 }

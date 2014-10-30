@@ -58,8 +58,12 @@ end
 
 function Arena:update(dt)
     for _,team in pairs(self.teams) do
-        for _,fighter in pairs(team) do
+        for k_f,fighter in pairs(team) do
             fighter:update(dt)
+
+            if fighter.dead then
+                team[k_f] = nil
+            end
         end
     end
 end

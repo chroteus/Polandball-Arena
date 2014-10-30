@@ -11,7 +11,7 @@ function Fighter:initialize(arg)
     self.defense = arg.defense or 5
 	self.defense = math.ceil(self.defense)
     
-    self.hp = arg.hp or 100
+    self.hp = arg.hp or 50
     self.hp = math.ceil(self.hp)
     self.max_hp = self.hp
 
@@ -49,7 +49,7 @@ function Fighter:initialize(arg)
 		still_north = anim8.newAnimation(grid(7,1), 0.1),
 		north = anim8.newAnimation(grid("7-9", 1), 0.1),
 	}
-	
+
     setmetatable(self.anim, {__index = function(t,k) error("Animation " .. k .. " doesn't exist") end})
     
 	self.timer = Timer.new()
@@ -64,19 +64,22 @@ function Fighter:initialize(arg)
     self.timer = Timer.new()
     
     self.items = {}
+    self.alpha = 255
     
 	return self
 end
 
 function Fighter:getDamage(attack_arg)
-	local netAtt = attack_arg - self.defense
+	local netAtt = attack_arg - (self.defense/2)
 	if netAtt < 1 then netAtt = 1 end
 	
-	self.hp = self.hp - netAtt
+	self.hp = self.hp - math.floor(netAtt)
 end
 
-function Fighter:knockback(angle, power)
+function Fighter:knockback(angle, power, onEnd)
     local power = power or 60
+    
+    self.timer:add(0.3, onEnd)
     self.timer:tween(0.3, self, {x = self.x + power*math.cos(angle)}, "out-quad")
     self.timer:tween(0.3, self, {y = self.y + power*math.sin(angle)}, "out-quad")
 end
@@ -164,6 +167,7 @@ function Fighter:_attackAnim()
     end
 end
 
+------------------------------------------------------------------------
 function Fighter:_onArrival()
     self.goal_x = nil
     self.goal_y = nil
@@ -179,15 +183,25 @@ end
 function Fighter:_onHit()
 end
 
+function Fighter:_onDie()
+    self.dead = true
+end
+
 function Fighter:_onAttack(enemy)
     local angle = math.atan2(enemy.y - self.y, enemy.x - self.x)
     enemy:getDamage(self.attack_stat)
     
-    enemy:knockback(angle)
+    if enemy.hp <= 0 then
+        enemy:knockback(angle, 200, function() enemy:_onDie() end)
+        enemy.timer:tween(0.3, enemy, {alpha = 0}, "out-quad")
+    else
+        enemy:knockback(angle)
+    end
+    
     enemy:_onHit()
     self:lookAt(enemy.x, enemy.y, {still = true})
 end
-    
+------------------------------------------------------------------------    
 
 -- Internal function, thus prefixed with an underscore.
 function Fighter:_move(dt)
@@ -254,31 +268,34 @@ end
 function Fighter:draw(x,y, noHP)
     local x = x or self.x
     local y = y or self.y
-
-    -- drawing item from behind
-    if self.anim_state == "east" or self.anim_state == "still_east" then
+    local function drawItems()
         for k,item in pairs(self.items) do
             item:draw(self.anim_state, x,y)
         end
     end
     
+    -- drawing item from behind
+    if self.anim_state == "east" or self.anim_state == "still_east" then
+        drawItems()
+    end
+    
+    love.graphics.setColor(255,255,255,self.alpha)
 	if not x or not y then error("Position for fighter not set") end
 	self.anim[self.anim_state]:draw(self.frames, x,y)
+    love.graphics.setColor(255,255,255)
     
     if self.anim_state ~= "east" and self.anim_state ~= "still_east" then
-        for k,item in pairs(self.items) do
-            item:draw(self.anim_state, x,y)
-        end
+        drawItems()
     end
 
     if not noHP then
         love.graphics.setColor(200,100,100, 128)
-        love.graphics.rectangle("line", self.x, self.y-10, self.width, 10)
-        love.graphics.rectangle("fill", self.x, self.y-10, (self.width/self.max_hp)*self.hp, 10)
+        love.graphics.rectangle("line", self.x, self.y-10, self.width, 12)
+        love.graphics.rectangle("fill", self.x, self.y-10, (self.width/self.max_hp)*self.hp, 12)
         love.graphics.setColor(255,255,255)
         love.graphics.setFont(FONT[14])
         love.graphics.print(self.hp .. "/" .. self.max_hp, 
-                            self.x, self.y-10-FONT[14]:getHeight()/4)
+                            self.x, self.y - 10 - FONT[14]:getHeight()/4 + 2)
         love.graphics.setColor(255,255,255)
     end
 end

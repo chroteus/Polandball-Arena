@@ -2,5 +2,5 @@ GLOBALS.fighters = {
     Fighter{name = "Poland"},
     
     Fighter{name    = "Germany",
-            hp      = 120,},
+            hp      = 60,},
 }
